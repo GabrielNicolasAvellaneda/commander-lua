@@ -1,3 +1,13 @@
+if exports then
+  exports.name = 'gna/commander'
+  exports.version = '0.0.1'
+  exports.private = true
+  exports.dependencies = {
+    "luvit/require",
+    "luvit/pretty-print"
+  }
+end
+
 local Object = require('core').Object
 local table = require('table')
 local strign = require('string')
@@ -53,6 +63,17 @@ function Program:_expandShortFlag(flag)
   return t
 end
 
+function Program:_addIgnoredArg(arg)
+  table.insert(self.args, arg)
+end
+
+function Program:_setField(flag)
+  local field = string.match(flag, '%-([a-zA-Z])')
+    if field then
+      self[field] = true
+    end
+end
+
 function Program:parse(args)
   table.foreach(args, function (_, v)
 
@@ -60,16 +81,13 @@ function Program:parse(args)
       local flags = self:_expandShortFlag(v)
       for _, o in ipairs(flags) do
         if self:_findShortOption(o) then
-          local field = string.match(o, '%-([a-zA-Z])')
-          if field then
-           self[field] = true
-          end
+          self:_setField(o)
         else
-          table.insert(self.args, o)
+          self:_addIgnoredArg(o)
         end
       end
     else
-      table.insert(self.args, v)
+      self:_addIgnoredArg(v)
     end
 
   end)

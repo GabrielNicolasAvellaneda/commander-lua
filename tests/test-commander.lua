@@ -41,12 +41,6 @@ require("tap")(function (test)
    assert(deepEqual(program:options(), { { short = '-s', description = 'Silent mode' }, { short = '-o', description = 'Another option' } }))
   end)
 
-  test('Program:_isShortFlag', function () 
-    local program = Program:new()
-    assert(program:_isShortFlag('-s'))
-    assert(not program:_isShortFlag('test'))
-  end)
-
   test('Program:parse should parse short options into fields', function ()
     local program = Program:new()
     program:option('-s', 'Silent mode')
@@ -65,15 +59,15 @@ require("tap")(function (test)
     assert(deepEqual({'-s', 'arg2', 'arg3'}, program.args))
   end)
 
-  test('Program:parse should parse collapsed short option into corresponding fields', function ()
+  test('Program:parse should parse collapsed short option into fields', function ()
     local program = Program:new()
     program:option('-s', 'Silent mode')
     program:option('-x', 'Extract')
     
-    program:parse { '-sx', '-t' }
+    program:parse({'-sx', '-t'})
 
-    assert(program.s, 'program.s should be set')
-    assert(program.x, 'program.x should be set')
+    assert(program.s)
+    assert(program.x)
     assert(deepEqual({'-t'}, program.args))
   end)
 
